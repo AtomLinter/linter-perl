@@ -1,0 +1,14 @@
+{
+  "name": "linter-perl",
+  "linter-package": true,
+  "activationEvents": [],
+  "main": "./lib/init",
+  "version": "0.0.0",
+  "description": "Lint perl on the fly, using perl (B::Lint)",
+  "repository": "https://github.com/s-shin/linter-perl",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {}
+}
