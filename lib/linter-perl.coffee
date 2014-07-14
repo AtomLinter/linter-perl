@@ -1,5 +1,7 @@
 linterPath = atom.packages.getLoadedPackage("linter").path
 Linter = require "#{linterPath}/lib/linter"
+fs = require "fs"
+path = require "path"
 
 class LinterPerl extends Linter
   @syntax: ["source.perl"]
@@ -14,7 +16,10 @@ class LinterPerl extends Linter
   constructor: (editor) ->
     super(editor)
 
-    @cmd = "#{process.env.SHELL} -l perl -MO=Lint,all"
+    useCarton = fs.existsSync(path.join(@cwd, "cpanfile.snapshot")) \
+      and fs.existsSync(path.join(@cwd, "local"))
+    bin = if useCarton then "carton exec -- perl" else "perl"
+    @cmd = "#{process.env.SHELL} -l #{bin} -MO=Lint,all"
 
     atom.config.observe "linter-perl.perlExecutablePath", =>
       @executablePath = atom.config.get "linter-perl.perlExecutablePath"
