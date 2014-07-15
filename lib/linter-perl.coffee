@@ -7,8 +7,8 @@ class LinterPerl extends Linter
   @syntax: ["source.perl"]
   linterName: "perl"
 
-  # Reset this in constructor because $SHELL isn't extracted in spawning.
-  cmd: "$SHELL perl -MO=Lint,all"
+  # Reset this in constructor
+  cmd: "perl -MO=Lint,all"
 
   regex: "(?<message>.*) at .* line (?<line>\\d+).*\\n"
   errorStream: "stderr"
@@ -19,7 +19,7 @@ class LinterPerl extends Linter
     useCarton = fs.existsSync(path.join(@cwd, "cpanfile.snapshot")) \
       and fs.existsSync(path.join(@cwd, "local"))
     bin = if useCarton then "carton exec -- perl" else "perl"
-    @cmd = "#{process.env.SHELL} -l #{bin} -MO=Lint,all"
+    @cmd = "#{process.env.SHELL} -l -- #{bin} -MO=Lint,all"
 
     atom.config.observe "linter-perl.perlExecutablePath", =>
       @executablePath = atom.config.get "linter-perl.perlExecutablePath"
