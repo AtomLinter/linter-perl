@@ -16,9 +16,10 @@ class LinterPerl extends Linter
   # configurable properties
   detectsCarton: true
   executesCommandViaShell: false
+  additionalPerlOptions: "-Ilib"
 
   setupCommand: ->
-    cmd = "perl -MO=Lint,all"
+    cmd = "perl #{@additionalPerlOptions} -MO=Lint,all"
     if @detectsCarton
       useCarton = fs.existsSync(path.join(@cwd, "cpanfile.snapshot")) \
         and fs.existsSync(path.join(@cwd, "local"))
@@ -44,6 +45,12 @@ class LinterPerl extends Linter
     do (name="linter-perl.perlExecutablePath") =>
       atom.config.observe name, =>
         @executablePath = atom.config.get name
+
+    do (name="linter-perl.additionalPerlOptions") =>
+      atom.config.observe name, =>
+        @additionalPerlOptions = atom.config.get name
+        @additionalPerlOptions ?= "-Ilib"
+        @setupCommand()
 
   destroy: ->
     atom.config.unobserve "linter-perl.#{name}" for name in [
