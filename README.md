@@ -16,7 +16,20 @@ You can configure linter-perl by editing ~/.atom/config.cson (choose Open Your C
 ```
 "linter-perl":
   "perlExecutablePath": null # perl path. run 'which perl' to find the path
+  "executeCommandViaShell": false # If it is true, the command is executed via `$SHELL -l`
+  "autoDetectCarton": true # If it is true, and "cpanfile.snapshot" and "local/" exist, carton command is used.
 ```
+
+### plenv Support
+
+There are three ways to use this package with [plenv](https://github.com/tokuhirom/plenv):
+
+- Open a project by `atom .` in your shell.
+- Otherwise (e.g. drag & drop),
+  - set `"/absolute/path/to/.plenv/shims"` to `perlExecutablePath` (this way is not portable)
+  - set `true` to `executeCommnadViaShell` (`perlExecutablePath` is ignored)
+
+[Perlbrew](http://perlbrew.pl/) is not tested, but those methods could be used.
 
 ## Contributing
 If you would like to contribute enhancements or fixes, please do the following:
