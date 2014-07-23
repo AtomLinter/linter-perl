@@ -38,7 +38,7 @@ class LinterPerl extends Linter
 
     do (name="linter-perl.executeCommandViaShell") =>
       atom.config.observe name, =>
-        @runsCommandViaShell = atom.config.get name
+        @executesCommandViaShell = atom.config.get name
         @setupCommand()
 
     do (name="linter-perl.perlExecutablePath") =>
