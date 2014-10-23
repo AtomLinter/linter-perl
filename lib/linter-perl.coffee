@@ -16,16 +16,32 @@ class LinterPerl extends Linter
   # configurable properties
   detectsCarton: true
   executesCommandViaShell: false
-  additionalPerlOptions: "-Ilib"
+  additionalPerlOptions: null
+  incPathsFromProjectPath: ["lib"]
 
   setupCommand: ->
-    cmd = "perl #{@additionalPerlOptions} -MO=Lint,all"
+    project_path = atom.project.getPath()
+
+    # build perl options
+    opts = do =>
+      paths = @incPathsFromProjectPath.map (p) ->
+        "-I" + path.join(project_path, p)
+      (if @additionalPerlOptions? then @additionalPerlOptions + " " else "") \
+        + paths.join(" ")
+
+    # base command
+    cmd = "perl #{opts} -MO=Lint,all"
+
+    # carton support
     if @detectsCarton
-      useCarton = fs.existsSync(path.join(@cwd, "cpanfile.snapshot")) \
-        and fs.existsSync(path.join(@cwd, "local"))
+      useCarton = fs.existsSync(path.join(project_path, "cpanfile.snapshot")) \
+        and fs.existsSync(path.join(project_path, "local"))
       cmd = "carton exec -- #{cmd}" if useCarton
+
+    # plenv/perlbrew support
     if @executesCommandViaShell
       cmd = "#{process.env.SHELL} -l -- #{cmd}"
+
     @cmd = cmd
 
   constructor: (editor) ->
@@ -49,12 +65,20 @@ class LinterPerl extends Linter
     do (name="linter-perl.additionalPerlOptions") =>
       atom.config.observe name, =>
         @additionalPerlOptions = atom.config.get name
-        @additionalPerlOptions ?= "-Ilib"
+        @setupCommand()
+
+    do (name="linter-perl.incPathsFromProjectPath") =>
+      atom.config.observe name, =>
+        @incPathsFromProjectPath = atom.config.get name
+        @incPathsFromProjectPath ?= ["lib"]
         @setupCommand()
 
   destroy: ->
     atom.config.unobserve "linter-perl.#{name}" for name in [
-      "autoDetectCarton", "executeCommnadViaShell", "perlExecutablePath"
+      "autoDetectCarton"
+      "executeCommnadViaShell"
+      "perlExecutablePath"
+      "incPathsFromProjectPath"
     ]
 
 module.exports = LinterPerl
