@@ -18,6 +18,7 @@ class LinterPerl extends Linter
   executesCommandViaShell: false
   additionalPerlOptions: null
   incPathsFromProjectPath: ["lib"]
+  lintOptions: "-no-bare-subs"
 
   setupCommand: ->
     project_path = atom.project.getPath()
@@ -30,7 +31,7 @@ class LinterPerl extends Linter
         + paths.join(" ")
 
     # base command
-    cmd = "perl #{opts} -MO=Lint,all"
+    cmd = "perl #{opts} -MO=Lint,#{@lintOptions}"
 
     # carton support
     if @detectsCarton
@@ -73,12 +74,19 @@ class LinterPerl extends Linter
         @incPathsFromProjectPath ?= ["lib"]
         @setupCommand()
 
+    do (name="linter-perl.lintOptions") =>
+      atom.config.observe name, =>
+        @lintOptions = atom.config.get name
+        @lintOptions ?= "-no-bare-subs"
+        @setupCommand()
+
   destroy: ->
     atom.config.unobserve "linter-perl.#{name}" for name in [
       "autoDetectCarton"
       "executeCommnadViaShell"
       "perlExecutablePath"
       "incPathsFromProjectPath"
+      "lintOptions"
     ]
 
 module.exports = LinterPerl
