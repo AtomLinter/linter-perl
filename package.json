@@ -3,7 +3,7 @@
   "linter-package": true,
   "activationEvents": [],
   "main": "./lib/init",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Lint perl on the fly, using perl (B::Lint)",
   "repository": "https://github.com/s-shin/linter-perl",
   "license": "MIT",
