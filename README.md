@@ -19,7 +19,7 @@ You can configure linter-perl by editing ~/.atom/config.cson (choose Open Your C
   "executeCommandViaShell": false # If it is true, the command is executed via `$SHELL -l`
   "autoDetectCarton": true # If it is true, and "cpanfile.snapshot" and "local/" exist, carton command is used.
   "additionalPerlOptions": "" # This is passed to the perl interpreter directly.
-  "incPathsFromProjectPath": ["lib"] # Relative include paths from the project directory.
+  "incPathsFromProjectPath": [".", "lib"] # Relative include paths from the project directory.
   "lintOptions": "-no-bare-subs" # B::Lint options. "-MO=Lint,HERE"
 ```
 

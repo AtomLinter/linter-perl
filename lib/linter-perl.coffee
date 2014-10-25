@@ -17,7 +17,7 @@ class LinterPerl extends Linter
   detectsCarton: true
   executesCommandViaShell: false
   additionalPerlOptions: null
-  incPathsFromProjectPath: ["lib"]
+  incPathsFromProjectPath: [".", "lib"]
   lintOptions: "-no-bare-subs"
 
   setupCommand: ->
@@ -71,7 +71,7 @@ class LinterPerl extends Linter
     do (name="linter-perl.incPathsFromProjectPath") =>
       atom.config.observe name, =>
         @incPathsFromProjectPath = atom.config.get name
-        @incPathsFromProjectPath ?= ["lib"]
+        @incPathsFromProjectPath ?= [".", "lib"]
         @setupCommand()
 
     do (name="linter-perl.lintOptions") =>
