@@ -13,14 +13,14 @@ It will be used with files that have the "Perl" syntax.
 ## Settings
 You can configure linter-perl by editing ~/.atom/config.cson (choose Open Your Config in Atom menu):
 
-```
+```coffee
 "linter-perl":
-  "perlExecutablePath": null # perl path. run 'which perl' to find the path
+  "perlExecutablePath": null      # perl path. run 'which perl' to find the path
   "executeCommandViaShell": false # If it is true, the command is executed via `$SHELL -l`
-  "autoDetectCarton": true # If it is true, and "cpanfile.snapshot" and "local/" exist, carton command is used.
-  "additionalPerlOptions": "" # This is passed to the perl interpreter directly.
+  "autoDetectCarton": true        # If it is true, and both "cpanfile.snapshot" and "local/" exist, carton command is used.
+  "additionalPerlOptions": ""     # This is passed to the perl interpreter directly.
   "incPathsFromProjectPath": [".", "lib"] # Relative include paths from the project directory.
-  "lintOptions": "-no-bare-subs" # B::Lint options. "-MO=Lint,HERE"
+  "lintOptions": "all"            # B::Lint options. "-MO=Lint,HERE"
 ```
 
 ### plenv Support

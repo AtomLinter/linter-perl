@@ -18,7 +18,7 @@ class LinterPerl extends Linter
   executesCommandViaShell: false
   additionalPerlOptions: null
   incPathsFromProjectPath: [".", "lib"]
-  lintOptions: "-no-bare-subs"
+  lintOptions: "all"
 
   setupCommand: ->
     project_path = atom.project.getPath()
@@ -77,7 +77,7 @@ class LinterPerl extends Linter
     do (name="linter-perl.lintOptions") =>
       atom.config.observe name, =>
         @lintOptions = atom.config.get name
-        @lintOptions ?= "-no-bare-subs"
+        @lintOptions ?= "all"
         @setupCommand()
 
   destroy: ->
