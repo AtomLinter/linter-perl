@@ -10,7 +10,7 @@ class LinterPerl extends Linter
   # Reset this on changing settings
   cmd: "perl -MO=Lint,all"
 
-  regex: "(?<message>.*) at .* line (?<line>\\d+).*\\n"
+  regex: "(?<message>.*) at .* line (?<line>\\d+)"
   errorStream: "stderr"
 
   # configurable properties
