@@ -11,17 +11,34 @@ It will be used with files that have the "Perl" syntax.
 * `apm install linter-perl`
 
 ## Settings
+
 You can configure linter-perl by editing ~/.atom/config.cson (choose Open Your Config in Atom menu):
 
 ```coffee
 "linter-perl":
-  "perlExecutablePath": null      # perl path. run 'which perl' to find the path
-  "executeCommandViaShell": false # If it is true, the command is executed via `$SHELL -l`
-  "autoDetectCarton": true        # If it is true, and both "cpanfile.snapshot" and "local/" exist, carton command is used.
-  "additionalPerlOptions": ""     # This is passed to the perl interpreter directly.
-  "incPathsFromProjectPath": [".", "lib"] # Relative include paths from the project directory.
-  "lintOptions": "all"            # B::Lint options. "-MO=Lint,HERE"
+  # The absolute directory path containing interpreter binaries.
+  # ex. "/Users/user/.plenv/shims"
+  "perlExecutablePath": null
+  # Is the command executed via `$SHELL -l`?
+  # This is usefull when PATH is updated in .bash_profile, etc.
+  # If it's true, perlExecutablePath option is ignored.
+  "executeCommandViaShell": false
+  # Is carton enabled if there are both "cpanfile.snapshot" and "local/"
+  # in the current root directory?
+  "autoDetectCarton": true
+  # This is passed to the perl interpreter directly.
+  "additionalPerlOptions": null
+  # Relative include paths from the current root directory.
+  "incPathsFromProjectPath": [".", "lib"]
+  # B::Lint options. "-MO=Lint,HERE"
+  # ex. "all,no-bare-subs,no-context"
+  "lintOptions": "all"
 ```
+
+NOTE: "The current root directory" is the root directory in tree-view
+which contains the file opened in the active text editor.
+If no root directories contain the file, its parent directory is selected
+as the current root directory.
 
 ### plenv Support
 
@@ -35,6 +52,7 @@ There are three ways to use this package with [plenv](https://github.com/tokuhir
 [Perlbrew](http://perlbrew.pl/) is not tested, but those methods could be used.
 
 ## Contributing
+
 If you would like to contribute enhancements or fixes, please do the following:
 
 1. Fork the plugin repository.

@@ -2,91 +2,84 @@ linterPath = atom.packages.getLoadedPackage("linter").path
 Linter = require "#{linterPath}/lib/linter"
 fs = require "fs"
 path = require "path"
+util = require "./util"
 
+module.exports =
 class LinterPerl extends Linter
+
+  @PACKAGE_NAME: "linter-perl"
+
+  @DEFAULT_CONFIG:
+    perlExecutablePath: null
+    executeCommandViaShell: false
+    audoDetectCarton: true
+    additionalPerlOptions: null
+    incPathsFromProjectPath: [".", "lib"]
+    lintOptions: "all"
+
+  @DEFAULT_COMMAND: "perl -MO=Lint,all"
+
   @syntax: ["source.perl"]
+
   linterName: "perl"
 
-  # Reset this on changing settings
-  cmd: "perl -MO=Lint,all"
-
-  regex: "(?<message>.*) at .* line (?<line>\\d+)"
   errorStream: "stderr"
 
-  # configurable properties
-  detectsCarton: true
-  executesCommandViaShell: false
-  additionalPerlOptions: null
-  incPathsFromProjectPath: [".", "lib"]
-  lintOptions: "all"
+  regex: "(?<message>.*) at .* line (?<line>\\d+)"
 
-  setupCommand: ->
-    project_path = atom.project.getPath()
+  cmd: @DEFAULT_COMMAND
 
-    # build perl options
-    opts = do =>
-      paths = @incPathsFromProjectPath.map (p) ->
-        "-I" + path.join(project_path, p)
-      (if @additionalPerlOptions? then @additionalPerlOptions + " " else "") \
-        + paths.join(" ")
+  # config state
+  config: util.clone(@DEFAULT_CONFIG)
 
-    # base command
-    cmd = "perl #{opts} -MO=Lint,#{@lintOptions}"
+  # build a lint command from the current states.
+  buildCommand: (rootDirectory) ->
+    cmd = "perl -MO=Lint"
+
+    # perl -MO=Lint,all,...
+    if @config.lintOptions
+      cmd += "," + @config.lintOptions
+
+    # perl -I. -Ilib ...
+    if @config.incPathsFromProjectPath.length > 0
+      cmd += " " + @config.incPathsFromProjectPath
+        .map (p) -> "-I" + path.join(rootDirectory, p)
+        .join " "
+
+    # perl --any --options
+    if @config.additionalPerlOptions
+      cmd += " " + @config.additionalPerlOptions
 
     # carton support
-    if @detectsCarton
-      useCarton = fs.existsSync(path.join(project_path, "cpanfile.snapshot")) \
-        and fs.existsSync(path.join(project_path, "local"))
-      cmd = "carton exec -- #{cmd}" if useCarton
+    if @config.audoDetectCarton
+      isCartonUsed = \
+        fs.existsSync(path.join(rootDirectory, "cpanfile.snapshot")) \
+        and fs.existsSync(path.join(rootDirectory, "local"))
+      cmd = "carton exec -- #{cmd}" if isCartonUsed
 
     # plenv/perlbrew support
-    if @executesCommandViaShell
-      cmd = "#{process.env.SHELL} -l -- #{cmd}"
+    if @config.executeCommandViaShell
+      cmd = "#{process.env.SHELL} -l #{cmd}"
+      @executablePath = null
+    else if @config.perlExecutablePath
+      @executablePath = @config.perlExecutablePath
 
-    @cmd = cmd
+    return cmd
+
+  # override
+  lintFile: (filePath, callback) ->
+    rootDirectory = util.determineRootDirectory()
+    if rootDirectory
+      @cmd = @buildCommand(rootDirectory)
+    else
+      @cmd = @constructor.DEFAULT_COMMAND
+    console.log @cmd
+    super filePath, callback
 
   constructor: (editor) ->
-    super(editor)
-
-    do (name="linter-perl.autoDetectCarton") =>
-      atom.config.observe name, =>
-        @detectsCarton = atom.config.get name
-        @detectsCarton ?= true
-        @setupCommand()
-
-    do (name="linter-perl.executeCommandViaShell") =>
-      atom.config.observe name, =>
-        @executesCommandViaShell = atom.config.get name
-        @setupCommand()
-
-    do (name="linter-perl.perlExecutablePath") =>
-      atom.config.observe name, =>
-        @executablePath = atom.config.get name
-
-    do (name="linter-perl.additionalPerlOptions") =>
-      atom.config.observe name, =>
-        @additionalPerlOptions = atom.config.get name
-        @setupCommand()
-
-    do (name="linter-perl.incPathsFromProjectPath") =>
-      atom.config.observe name, =>
-        @incPathsFromProjectPath = atom.config.get name
-        @incPathsFromProjectPath ?= [".", "lib"]
-        @setupCommand()
-
-    do (name="linter-perl.lintOptions") =>
-      atom.config.observe name, =>
-        @lintOptions = atom.config.get name
-        @lintOptions ?= "all"
-        @setupCommand()
-
-  destroy: ->
-    atom.config.unobserve "linter-perl.#{name}" for name in [
-      "autoDetectCarton"
-      "executeCommnadViaShell"
-      "perlExecutablePath"
-      "incPathsFromProjectPath"
-      "lintOptions"
-    ]
-
-module.exports = LinterPerl
+    super editor
+    for name, defaultValue of @constructor.DEFAULT_CONFIG
+      keyPath = "#{@constructor.PACKAGE_NAME}.#{name}"
+      atom.config.observe keyPath, (value) =>
+        @config[name] = value
+        @config[name] ?= defaultValue
