@@ -73,7 +73,7 @@ class LinterPerl extends Linter
       @cmd = @buildCommand(rootDirectory)
     else
       @cmd = @constructor.DEFAULT_COMMAND
-    console.log @cmd
+    #console.log @cmd
     super filePath, callback
 
   constructor: (editor) ->
