@@ -2,7 +2,7 @@
   "name": "linter-perl",
   "linter-package": true,
   "main": "./lib/init",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Lint perl on the fly, using perl (B::Lint)",
   "repository": "https://github.com/s-shin/linter-perl",
   "license": "MIT",
