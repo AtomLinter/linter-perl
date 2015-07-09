@@ -1,13 +1,22 @@
 {
   "name": "linter-perl",
-  "linter-package": true,
   "main": "./lib/init",
   "version": "0.5.1",
   "description": "Lint perl on the fly, using perl (B::Lint)",
   "repository": "https://github.com/s-shin/linter-perl",
   "license": "MIT",
   "engines": {
-    "atom": ">=0.174.0 <2.0.0"
+    "atom": ">=1.0.0 <2.0.0"
   },
-  "dependencies": {}
+  "providedServices": {
+    "linter": {
+      "versions": {
+        "1.0.0": "provideLinter"
+      }
+    }
+  },
+  "dependencies": {
+    "grim": "^1.4.1",
+    "lodash": "^3.10.0"
+  }
 }

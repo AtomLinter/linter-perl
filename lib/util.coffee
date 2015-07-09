@@ -11,10 +11,8 @@ findIndex = (values, fn) ->
 clone = (obj) -> JSON.parse(JSON.stringify(obj))
 
 # Determine the root directory of the active text editor.
-determineRootDirectory = ->
-  editor = atom.workspace.getActiveTextEditor()
-  return unless editor
-  activeFilePath = editor.getPath()
+determineRootDirectory = (textEditor) ->
+  activeFilePath = textEditor.getPath()
   dirs = atom.project.getDirectories()
   # https://github.com/atom/atom/blob/v0.194.0/src/project.coffee#L303
   idx = findIndex dirs, (dir) -> dir.contains(activeFilePath)

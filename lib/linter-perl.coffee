@@ -1,85 +1,111 @@
-linterPath = atom.packages.getLoadedPackage("linter").path
-Linter = require "#{linterPath}/lib/linter"
+{CompositeDisposable, BufferedProcess} = require "atom"
+pkg = require "../package.json"
 fs = require "fs"
 path = require "path"
+{deprecate} = require "grim"
+_ = {
+  isEqual: require "lodash/lang/isEqual"
+}
 util = require "./util"
 
-module.exports =
-class LinterPerl extends Linter
+module.exports = class LinterPerl
 
-  @PACKAGE_NAME: "linter-perl"
+  grammarScopes: ["source.perl"]
+  scope: "file"
+  lintOnFly: true
 
-  @DEFAULT_CONFIG:
-    perlExecutablePath: null
-    executeCommandViaShell: false
-    audoDetectCarton: true
-    additionalPerlOptions: null
-    incPathsFromProjectPath: [".", "lib"]
-    lintOptions: "all"
+  #---
 
-  @DEFAULT_COMMAND: "perl -MO=Lint,all"
+  config: {}
 
-  @syntax: ["source.perl"]
+  DEPRECATED_OPTIONS =
+    perlExecutablePath: "executablePath"
+    incPathsFromProjectPath: "incPathsFromProjectRoot"
 
-  linterName: "perl"
+  constructor: (configSchema) ->
+    @subscriptions = new CompositeDisposable
+    for name of configSchema
+      keyPath = "#{pkg.name}.#{name}"
+      value = atom.config.get keyPath
+      if DEPRECATED_OPTIONS[name]
+        unless _.isEqual value, configSchema[name].default
+          deprecate """
+          #{pkg.name}.#{name} is deprecated.
+          Please use #{pkg.name}.#{DEPRECATED_OPTIONS[name]} in your config.
+          """
+        name = DEPRECATED_OPTIONS[name]
+      @config[name] = value
+      @subscriptions.add atom.config.observe keyPath, (value) =>
+        @config[name] = value
 
-  errorStream: "stderr"
+  destructor: ->
+    @subscriptions.dispose()
 
-  regex: "(?<message>.*) at .* line (?<line>\\d+)"
+  RE = /(.*) at .* line (\d+)/
 
-  cmd: @DEFAULT_COMMAND
+  lint: (textEditor) ->
+    new Promise (resolve, reject) =>
+      buf = []
+      stdout = (output) -> buf.push output
+      stderr = (output) -> buf.push output
+      exit = (code) ->
+        results = []
+        for line in buf.join("\n").split("\n")
+          m = line.match RE
+          continue unless m and m.length is 3
+          [unused, message, lineNum] = m
+          results.push
+            type: 'Error'
+            text: message
+            range: [
+              [lineNum-1, 0]
+              [lineNum-1, textEditor.getBuffer().lineLengthForRow(lineNum-1)]
+            ]
+        resolve results
 
-  # config state
-  config: util.clone(@DEFAULT_CONFIG)
+      filePath = textEditor.getPath()
+      rootDirectory = util.determineRootDirectory(textEditor)
+      {command, args} = @buildCommand filePath, rootDirectory
+      options = stdin: "ignore"
+      process = new BufferedProcess \
+        {command, args, stdout, stderr, exit, options}
+      process.onWillThrowError ({error, handle}) ->
+        atom.notifications.addError "Failed to run #{command}.",
+          detail: error.message
+          dismissable: true
+        handle()
+        resolve []
 
   # build a lint command from the current states.
-  buildCommand: (rootDirectory) ->
-    cmd = "perl -MO=Lint"
+  buildCommand: (filePath, rootDirectory) ->
+    cmd = ["perl", "-MO=Lint"]
 
     # perl -MO=Lint,all,...
     if @config.lintOptions
-      cmd += "," + @config.lintOptions
+      cmd[1] += "," + @config.lintOptions
 
     # perl -I. -Ilib ...
-    if @config.incPathsFromProjectPath.length > 0
-      cmd += " " + @config.incPathsFromProjectPath
-        .map (p) -> "-I" + path.join(rootDirectory, p)
-        .join " "
+    if @config.incPathsFromProjectRoot.length > 0
+      cmd = cmd.concat @config.incPathsFromProjectRoot.map (p) ->
+        "-I" + path.join(rootDirectory, p)
 
     # perl --any --options
     if @config.additionalPerlOptions
-      cmd += " " + @config.additionalPerlOptions
+      cmd = cmd.concat @config.additionalPerlOptions
+
+    # perl -MO=Lint file
+    cmd.push filePath
 
     # carton support
     if @config.audoDetectCarton
       isCartonUsed = \
         fs.existsSync(path.join(rootDirectory, "cpanfile.snapshot")) \
         and fs.existsSync(path.join(rootDirectory, "local"))
-      cmd = "carton exec -- #{cmd}" if isCartonUsed
+      cmd = ["carton", "exec", "--"].concat cmd if isCartonUsed
 
     # plenv/perlbrew support
     if @config.executeCommandViaShell
-      cmd = "#{process.env.SHELL} -l #{cmd}"
-      @executablePath = null
-    else if @config.perlExecutablePath
-      @executablePath = @config.perlExecutablePath
+      cmd = [process.env.SHELL, "-lc", cmd.join(" ")]
 
-    return cmd
-
-  # override
-  lintFile: (filePath, callback) ->
-    rootDirectory = util.determineRootDirectory()
-    if rootDirectory
-      @cmd = @buildCommand(rootDirectory)
-    else
-      @cmd = @constructor.DEFAULT_COMMAND
-    #console.log @cmd
-    super filePath, callback
-
-  constructor: (editor) ->
-    super editor
-    for name, defaultValue of @constructor.DEFAULT_CONFIG
-      keyPath = "#{@constructor.PACKAGE_NAME}.#{name}"
-      atom.config.observe keyPath, (value) =>
-        @config[name] = value
-        @config[name] ?= defaultValue
+    [command, args...] = cmd
+    {command, args}

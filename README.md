@@ -18,7 +18,7 @@ You can configure linter-perl by editing ~/.atom/config.cson (choose Open Your C
 "linter-perl":
   # The absolute directory path containing interpreter binaries.
   # ex. "/Users/user/.plenv/shims"
-  "perlExecutablePath": null
+  "executablePath": null
   # Is the command executed via `$SHELL -l`?
   # This is usefull when PATH is updated in .bash_profile, etc.
   # If it's true, perlExecutablePath option is ignored.
@@ -29,7 +29,7 @@ You can configure linter-perl by editing ~/.atom/config.cson (choose Open Your C
   # This is passed to the perl interpreter directly.
   "additionalPerlOptions": null
   # Relative include paths from the current root directory.
-  "incPathsFromProjectPath": [".", "lib"]
+  "incPathsFromProjectRoot": [".", "lib"]
   # B::Lint options. "-MO=Lint,HERE"
   # ex. "all,no-bare-subs,no-context"
   "lintOptions": "all"
