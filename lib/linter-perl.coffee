@@ -66,9 +66,7 @@ module.exports = class LinterPerl
       filePath = textEditor.getPath()
       rootDirectory = util.determineRootDirectory(textEditor)
       {command, args} = @buildCommand filePath, rootDirectory
-      options = stdin: "ignore"
-      process = new BufferedProcess \
-        {command, args, stdout, stderr, exit, options}
+      process = new BufferedProcess {command, args, stdout, stderr, exit}
       process.onWillThrowError ({error, handle}) ->
         atom.notifications.addError "Failed to run #{command}.",
           detail: error.message
