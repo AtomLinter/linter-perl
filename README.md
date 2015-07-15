@@ -20,8 +20,8 @@ You can configure linter-perl by editing ~/.atom/config.cson (choose Open Your C
   # ex. "/Users/user/.plenv/shims"
   "executablePath": null
   # Is the command executed via `$SHELL -l`?
-  # This is usefull when PATH is updated in .bash_profile, etc.
-  # If it's true, perlExecutablePath option is ignored.
+  # This is useful when PATH is setup in .bash_profile, etc.
+  # If true, perlExecutablePath option is ignored.
   "executeCommandViaShell": false
   # Is carton enabled if there are both "cpanfile.snapshot" and "local/"
   # in the current root directory?
