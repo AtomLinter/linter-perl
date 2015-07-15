@@ -95,7 +95,7 @@ module.exports = class LinterPerl
     cmd.push filePath
 
     # carton support
-    if @config.audoDetectCarton
+    if @config.autoDetectCarton
       isCartonUsed = \
         fs.existsSync(path.join(rootDirectory, "cpanfile.snapshot")) \
         and fs.existsSync(path.join(rootDirectory, "local"))
