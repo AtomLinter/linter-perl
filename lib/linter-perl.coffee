@@ -41,7 +41,7 @@ module.exports = class LinterPerl
   destructor: ->
     @subscriptions.dispose()
 
-  RE = /(.*) at .* line (\d+)/
+  RE = /(.*) at (.*) line (\d+)/
 
   lint: (textEditor) ->
     new Promise (resolve, reject) =>
@@ -52,11 +52,12 @@ module.exports = class LinterPerl
         results = []
         for line in buf.join("\n").split("\n")
           m = line.match RE
-          continue unless m and m.length is 3
-          [unused, message, lineNum] = m
+          continue unless m and m.length is 4
+          [unused, message, filePath, lineNum] = m
           results.push
             type: 'Error'
             text: message
+            filePath: filePath
             range: [
               [lineNum-1, 0]
               [lineNum-1, textEditor.getBuffer().lineLengthForRow(lineNum-1)]
