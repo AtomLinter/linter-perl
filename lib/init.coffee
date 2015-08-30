@@ -22,7 +22,7 @@ module.exports =
       description: """
       Is the command executed via `$SHELL -l`?
       This is useful when PATH is setup in .bash_profile, etc.
-      If true, perlExecutablePath option is ignored.
+      If true, executablePath option is ignored.
       """
     autoDetectCarton:
       type: "boolean"
