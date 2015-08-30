@@ -1,7 +1,7 @@
 {
   "name": "linter-perl",
   "main": "./lib/init",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Lint perl on the fly, using perl (B::Lint)",
   "repository": "https://github.com/s-shin/linter-perl",
   "license": "MIT",
