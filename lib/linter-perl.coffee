@@ -11,6 +11,7 @@ util = require "./util"
 module.exports = class LinterPerl
 
   grammarScopes: ["source.perl"]
+  name: "B::Lint"
   scope: "file"
   lintOnFly: true
 
