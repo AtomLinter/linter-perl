@@ -62,6 +62,7 @@ module.exports =
       """
 
   activate: ->
+    require("atom-package-deps").install("linter-perl")
     @linterPerl = new LinterPerl @config
 
   deactivate: ->
