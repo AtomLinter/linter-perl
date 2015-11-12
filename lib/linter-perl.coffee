@@ -19,6 +19,8 @@ module.exports = class LinterPerl
 
   config: {}
 
+  BLintFound: {}
+
   DEPRECATED_OPTIONS =
     perlExecutablePath: "executablePath"
     incPathsFromProjectPath: "incPathsFromProjectRoot"
@@ -45,7 +47,9 @@ module.exports = class LinterPerl
   RE = /(.*) at (.*) line (\d+)/
 
   lint: (textEditor) ->
-    new Promise (resolve, reject) =>
+    rootDirectory = util.determineRootDirectory(textEditor)
+
+    lint = (resolve, reject) =>
       buf = []
       stdout = (output) -> buf.push output
       stderr = (output) -> buf.push output
@@ -66,15 +70,39 @@ module.exports = class LinterPerl
         resolve results
 
       filePath = textEditor.getPath()
-      rootDirectory = util.determineRootDirectory(textEditor)
       {command, args} = @buildCommand filePath, rootDirectory
-      process = new BufferedProcess {command, args, stdout, stderr, exit}
+      options = cwd: rootDirectory
+      process = new BufferedProcess \
+        {command, args, stdout, stderr, exit, options}
       process.onWillThrowError ({error, handle}) ->
         atom.notifications.addError "Failed to run #{command}.",
           detail: error.message
           dismissable: true
         handle()
         resolve []
+
+    new Promise (resolve, reject) =>
+      @checkBLint rootDirectory
+        .then -> lint resolve, reject
+        .catch reject
+
+  checkBLint: (rootDirectory) ->
+    new Promise (resolve, reject) =>
+      resolve true if @BLintFound[rootDirectory]
+      {command, args} = @buildCommandToCheckBLint rootDirectory
+      exit = (code) =>
+        @BLintFound[rootDirectory] = !code
+        if @BLintFound[rootDirectory]
+          resolve true
+        else
+          reject
+            toString: -> "B::Lint not found."
+            stack: """
+            You should make sure to install B::Lint.
+            From 5.20, B::Lint is removed from core modules.
+            """
+      options = cwd: rootDirectory
+      process = new BufferedProcess {command, args, exit, options}
 
   # build a lint command from the current states.
   buildCommand: (filePath, rootDirectory) ->
@@ -96,6 +124,15 @@ module.exports = class LinterPerl
     # perl -MO=Lint file
     cmd.push filePath
 
+    [command, args...] = @enhancePerlCommand cmd, rootDirectory
+    {command, args}
+
+  buildCommandToCheckBLint: (rootDirectory) ->
+    [command, args...] = @enhancePerlCommand \
+      ["perldoc", "-l", "B::Lint"], rootDirectory
+    {command, args}
+
+  enhancePerlCommand: (cmd, rootDirectory) ->
     # carton support
     if @config.autoDetectCarton
       isCartonUsed = \
@@ -107,5 +144,4 @@ module.exports = class LinterPerl
     if @config.executeCommandViaShell
       cmd = [process.env.SHELL, "-lc", cmd.join(" ")]
 
-    [command, args...] = cmd
-    {command, args}
+    cmd
