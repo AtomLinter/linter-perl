@@ -7,7 +7,8 @@ It will be used with files that have the "Perl" syntax.
 ## Installation
 
 * Install [Perl 5](http://www.perl.org/).
-* `apm install linter` (if you didn't install Linter).
+* `apm install linter` (optional)
+  * If you didn't install linter package, it will be installed on first activation.
 * `apm install linter-perl`
 
 ## Settings
