@@ -129,7 +129,7 @@ module.exports = class LinterPerl
 
   buildCommandToCheckBLint: (rootDirectory) ->
     [command, args...] = @enhancePerlCommand \
-      ["perldoc", "-l", "B::Lint"], rootDirectory
+      ["perl", "-MB::Lint", "-e", "1"], rootDirectory
     {command, args}
 
   enhancePerlCommand: (cmd, rootDirectory) ->
