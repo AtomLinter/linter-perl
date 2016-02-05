@@ -59,14 +59,19 @@ module.exports = class LinterPerl
           m = line.match RE
           continue unless m and m.length is 4
           [unused, message, filePath, lineNum] = m
-          results.push
+          range = null
+          buffer = textEditor.getBuffer()
+          if lineNum <= buffer.getLineCount()
+            range = [
+              [lineNum-1, 0]
+              [lineNum-1, buffer.lineLengthForRow(lineNum-1)]
+            ]
+          results.push {
             type: 'Error'
             text: message
-            filePath: filePath
-            range: [
-              [lineNum-1, 0]
-              [lineNum-1, textEditor.getBuffer().lineLengthForRow(lineNum-1)]
-            ]
+            filePath
+            range
+          }
         resolve results
 
       filePath = textEditor.getPath()
