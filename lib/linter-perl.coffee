@@ -66,12 +66,13 @@ module.exports = class LinterPerl
               [lineNum-1, 0]
               [lineNum-1, buffer.lineLengthForRow(lineNum-1)]
             ]
-          results.push {
-            type: 'Error'
-            text: message
-            filePath
-            range
-          }
+          if range and message?.length
+            results.push {
+              type: 'Error'
+              text: message
+              filePath
+              range
+            }
         resolve results
 
       filePath = textEditor.getPath()
