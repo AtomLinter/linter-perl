@@ -113,6 +113,8 @@ module.exports = class LinterPerl
   # build a lint command from the current states.
   buildCommand: (filePath, rootDirectory) ->
     cmd = ["perl", "-MO=Lint"]
+	if @config.executablePath
+	  cmd[0] = @config.executablePath + "/perl"
 
     # perl -MO=Lint,all,...
     if @config.lintOptions
