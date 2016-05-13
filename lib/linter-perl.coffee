@@ -139,6 +139,10 @@ module.exports = class LinterPerl
     {command, args}
 
   enhancePerlCommand: (cmd, rootDirectory) ->
+    if @config.executablePath
+      cmd[0] = @config.executablePath
+      return cmd
+
     # carton support
     if @config.autoDetectCarton
       isCartonUsed = \
