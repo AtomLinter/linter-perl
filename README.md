@@ -17,8 +17,8 @@ You can configure linter-perl by editing ~/.atom/config.cson (choose Open Your C
 
 ```coffee
 "linter-perl":
-  # The absolute directory path containing interpreter binaries.
-  # ex. "/Users/user/.plenv/shims"
+  # The absolute path of perl interpreter.
+  # If this was given, executeCommandViaShell and autoDetectCarton are ignored.
   "executablePath": null
   # Is the command executed via `$SHELL -l`?
   # This is useful when PATH is setup in .bash_profile, etc.

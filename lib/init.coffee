@@ -13,8 +13,9 @@ module.exports =
       type: "string"
       default: ""
       description: """
-      The absolute directory path containing interpreter binaries.
-      (ex. "/Users/user/.plenv/shims")
+      The absolute path of perl interpreter.
+      If this was given, `executeCommandViaShell` and `autoDetectCarton`
+      are ignored.
       """
     executeCommandViaShell:
       type: "boolean"
