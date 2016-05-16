@@ -154,4 +154,8 @@ module.exports = class LinterPerl
     if @config.executeCommandViaShell
       cmd = [process.env.SHELL, "-lc", cmd.join(" ")]
 
+    # support for executablePath
+    if @config.executablePath
+      cmd[0] = @config.executablePath + "/perl"
+
     cmd
