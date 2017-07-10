@@ -89,24 +89,29 @@ module.exports = class LinterPerl
 
     new Promise (resolve, reject) =>
       @checkBLint rootDirectory
-        .then -> lint resolve, reject
+        .then (ok) ->
+          return resolve [] unless ok
+          lint resolve, reject
         .catch reject
 
   checkBLint: (rootDirectory) ->
     new Promise (resolve, reject) =>
-      resolve true if @BLintFound[rootDirectory]
+      return resolve true if @BLintFound[rootDirectory]
       {command, args} = @buildCommandToCheckBLint rootDirectory
       exit = (code) =>
         @BLintFound[rootDirectory] = !code
         if @BLintFound[rootDirectory]
           resolve true
         else
-          reject
-            toString: -> "B::Lint not found."
-            stack: """
-            You should make sure to install B::Lint.
-            From 5.20, B::Lint is removed from core modules.
+          atom.notifications.addError "B::Lint not found.",
+            description: """
+            You should make sure whether B::Lint is installed or not
+            because B::Lint was removed from the core modules in perl v5.20.
+            For example, if you got an error by executing `perl -MB::Lint -e 1`,
+            you have to install B::Lint.
             """
+            dismissable: true
+          resolve false
       options = cwd: rootDirectory
       process = new BufferedProcess {command, args, exit, options}
 
