@@ -16,7 +16,7 @@
     }
   },
   "dependencies": {
-    "atom-package-deps": "^3.0.1",
+    "atom-package-deps": "^4.6.0",
     "grim": "^1.4.1",
     "lodash": "^3.10.0"
   },
