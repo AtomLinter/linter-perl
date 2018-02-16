@@ -3,7 +3,7 @@
   "main": "./lib/init",
   "version": "0.8.1",
   "description": "Lint perl on the fly, using perl (B::Lint)",
-  "repository": "https://github.com/s-shin/linter-perl",
+  "repository": "https://github.com/AtomLinter/linter-perl",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
