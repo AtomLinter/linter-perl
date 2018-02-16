@@ -7,6 +7,7 @@ _ = {
   isEqual: require "lodash/lang/isEqual"
 }
 util = require "./util"
+helpers = require 'atom-linter'
 
 module.exports = class LinterPerl
 
@@ -59,13 +60,10 @@ module.exports = class LinterPerl
           m = line.match RE
           continue unless m and m.length is 4
           [unused, message, filePath, lineNum] = m
-          range = null
-          buffer = textEditor.getBuffer()
-          if lineNum <= buffer.getLineCount()
-            range = [
-              [lineNum-1, 0]
-              [lineNum-1, buffer.lineLengthForRow(lineNum-1)]
-            ]
+          try
+            range = helpers.generateRange(textEditor, lineNum - 1)
+          catch error
+            range = null
           if range and message?.length
             results.push {
               type: 'Error'
