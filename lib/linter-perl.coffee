@@ -14,7 +14,7 @@ module.exports = class LinterPerl
   grammarScopes: ["source.perl"]
   name: "B::Lint"
   scope: "file"
-  lintOnFly: false
+  lintsOnChange: false
 
   #---
 
@@ -63,13 +63,15 @@ module.exports = class LinterPerl
           try
             range = helpers.generateRange(textEditor, lineNum - 1)
           catch error
-            range = null
+            range = helpers.generateRange(textEditor, 0)
           if range and message?.length
             results.push {
-              type: 'Error'
-              text: message
-              filePath
-              range
+              severity: 'error'
+              excerpt: message
+              location: {
+                file: filePath
+                position: range
+              }
             }
         resolve results
 
