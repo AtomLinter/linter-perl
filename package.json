@@ -21,6 +21,21 @@
     "grim": "^1.4.1",
     "lodash": "^3.10.0"
   },
+  "renovate": {
+    "extends": [
+      "config:base"
+    ],
+    "semanticCommits": true,
+    "rangeStrategy": "pin",
+    "packageRules": [
+      {
+        "packagePatterns": [
+          "^eslint"
+        ],
+        "groupName": "ESLint packages"
+      }
+    ]
+  },
   "package-deps": [
     "linter:2.0.0"
   ]
