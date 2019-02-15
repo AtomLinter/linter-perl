@@ -2,6 +2,7 @@
   "name": "linter-perl",
   "main": "./lib/init",
   "version": "0.9.0",
+  "private": true,
   "description": "Lint perl on the fly, using perl (B::Lint)",
   "repository": "https://github.com/AtomLinter/linter-perl",
   "license": "MIT",
