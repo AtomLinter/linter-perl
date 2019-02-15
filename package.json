@@ -2,6 +2,7 @@
   "name": "linter-perl",
   "main": "./lib/init",
   "version": "0.9.0",
+  "private": true,
   "description": "Lint perl on the fly, using perl (B::Lint)",
   "repository": "https://github.com/AtomLinter/linter-perl",
   "license": "MIT",
@@ -20,6 +21,21 @@
     "atom-package-deps": "^5.0.0",
     "grim": "^1.4.1",
     "lodash": "^3.10.0"
+  },
+  "renovate": {
+    "extends": [
+      "config:base"
+    ],
+    "semanticCommits": true,
+    "rangeStrategy": "pin",
+    "packageRules": [
+      {
+        "packagePatterns": [
+          "^eslint"
+        ],
+        "groupName": "ESLint packages"
+      }
+    ]
   },
   "package-deps": [
     "linter:2.0.0"
